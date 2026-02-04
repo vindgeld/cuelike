@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>cuelike — Timeline</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- SheetJS for import/export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="left">
+      <h1>cuelike</h1>
+      <div class="top-controls">
+        <button id="createProjectBtn">New Project</button>
+        <select id="projectSelect"></select>
+        <button id="addSegmentBtn">Add Segment</button>
+        <button id="exportBtn">Export XLSX</button>
+        <button id="importBtn">Import XLSX</button>
+        <input id="file-input" type="file" accept=".xlsx" style="display:none" />
+      </div>
+    </div>
+  </header>
+
+    <div class="right">
+      <input type="file" id="videoInput" accept="video/*" />
+      <input id="youtubeURL" type="text" placeholder="Paste YouTube URL" style="width:260px;margin-left:8px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)">
+      <button id="loadYoutubeBtn">Load YouTube</button>
+    </div>
+      <div class="player-wrap">
+        <video id="video" controls crossorigin="anonymous"></video>
+        <div id="youtubePlayer" class="youtube-player hidden"></div>
+      </div>
+  <main class="app">
+    
+    <div class="sidebar">
+      <div class="project-info">
+        <h2 id="projectTitle">(no project)</h2>
+        <div id="segmentsSummary"></div>
+      <ul id="segmentList" class="segment-list"></ul>
+      </div>
+    </div>
+
+      <div id="timelineWrap" class="timeline-wrap">
+        <div id="ruler" class="ruler"></div>
+        <div id="timeline" class="timeline"></div>
+        <div id="playhead" class="playhead" title="Current time"></div>
+      </div>
+
+      <div class="timeline-footer">
+        <label>Scale: <input id="scaleRange" type="range" min="10" max="200" value="60"></label>
+        <span id="scaleValue">60 px/s</span>
+      </div>
+    
+      <!-- Templates area -->
+      <div class="templates-panel">
+        <div class="templates-header">
+          <strong>Templates</strong>
+          <div>
+            <button id="addTemplateBtn" title="Create a new template">+ Add Template</button>
+            <button id="importTemplatesBtn" title="Import templates (JSON)">Import</button>
+            <button id="exportTemplatesBtn" title="Export templates (JSON)">Export</button>
+          </div>
+        </div>
+        <div id="templateButtons" class="template-buttons" aria-live="polite"></div>
+        <div class="templates-hint">Drag a template and drop on another to reorder.</div>
+      </div>
+  </main>
+
+  <!-- Modal: Add/Edit Segment -->
+  <div id="segmentModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h3 id="modalTitle">Add Segment</h3>
+      <label>Start (s)</label>
+      <input id="segStart" type="number" min="0" step="0.1" value="0" />
+      <label>Duration (s)</label>
+      <input id="segDuration" type="number" min="0.1" step="0.1" value="5" />
+      <label>Title</label>
+      <input id="segTitle" type="text" placeholder="Segment title" />
+      <label>Remarks</label>
+      <textarea id="segRemarks" rows="3"></textarea>
+      <label>Color</label>
+      <input id="segColor" type="color" value="#00cc88" />
+      <div class="modal-actions">
+        <button id="saveSegBtn">Save</button>
+        <button id="cancelSegBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create/Edit Template (horizontal layout with preview and validation) -->
+  <div id="templateModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content template-modal">
+      <div class="template-form">
+        <div class="template-left">
+          <h3 id="templateModalTitle">New Template</h3>
+          <label>Title</label>
+          <input id="tplTitle" type="text" placeholder="Template title" />
+          <div class="field-row">
+            <div>
+              <label>Default duration (s)</label>
+              <input id="tplDuration" type="number" min="0.1" step="0.1" value="3" />
+            </div>
+            <div>
+              <label>Color</label>
+              <input id="tplColor" type="color" value="#00cc88" />
+            </div>
+          </div>
+          <div id="tplError" class="field-error" aria-live="assertive"></div>
+          <div class="modal-actions">
+            <button id="saveTplBtn">Save</button>
+            <button id="cancelTplBtn">Cancel</button>
+          </div>
+        </div>
+
+        <div class="template-right">
+          <label>Preview</label>
+          <div id="templatePreview" class="template-preview"></div>
+          <div class="preview-note">The preview shows how the template button will appear.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
